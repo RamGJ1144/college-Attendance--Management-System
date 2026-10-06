@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login -college Attendance Management</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f9;
+            margin: 0;
+            background-image: url('p.webp');
+            background-size: cover;
+        }
+
+        /* LOGIN PAGE */
+        #loginPage {
+            width: 350px;
+            margin: 120px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px #ccc;
+            text-align: center;
+        }
+
+        #loginPage h1 {
+            background: #2563eb;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        #loginPage input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .loginBtn {
+            width: 95%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .loginBtn:hover {
+            background: #1d4ed8;
+        }
+
+
+        /* ATTENDANCE PAGE */
+        #attendancePage {
+            display: none;
+            font-family: Arial;
+            margin: 30px;
+            background: #f4f6f9;
+        }
+
+        h1 {
+            background: #2563eb;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        input {
+            padding: 10px;
+            margin: 5px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        .add {
+            background: green;
+        }
+
+        .present {
+            background: green;
+        }
+
+        .absent {
+            background: red;
+        }
+
+        .delete {
+            background: #555;
+        }
+
+        .logout {
+            background: #dc2626;
+            float: right;
+            margin-top: -65px;
+            margin-right: 20px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+
+<!-- ================= LOGIN PAGE ================= -->
+
+<div id="loginPage">
+
+    <h1>Login</h1>
+
+    <input type="text"
+           id="username"
+           placeholder="Enter Username">
+
+    <input type="password"
+           id="password"
+           placeholder="Enter Password">
+
+    <button class="loginBtn" onclick="login()">
+        Login
+    </button>
+
+</div>
+
+
+<!-- ================= ATTENDANCE PAGE ================= -->
+
+<div id="attendancePage">
+
+    <h1>Attendance Management System</h1>
+
+    <button class="logout" onclick="logout()">
+        Logout
+    </button>
+
+    <h2>Add Student</h2>
+
+    <input type="text"
+           id="roll"
+           placeholder="Roll Number">
+
+    <input type="text"
+           id="name"
+           placeholder="Student Name">
+
+    <button class="add" onclick="addStudent()">
+        Add Student
+    </button>
+
+
+    <h2>Students</h2>
+
+    <table>
+
+        <tr>
+            <th>S.No</th>
+            <th>Roll Number</th>
+            <th>Name</th>
+            <th>Present</th>
+            <th>Absent</th>
+            <th>Total Days</th>
+            <th>Attendance %</th>
+            <th>Delete</th>
+        </tr>
+
+        <tbody id="table"></tbody>
+
+    </table>
+
+</div>
+
+
+<script>
+
+/* ================= LOGIN ================= */
+
+function login() {
+
+    let username =
+        document.getElementById("username").value;
+
+    let password =
+        document.getElementById("password").value;
+
+    /*
+       ANY username and password will work
+    */
+
+    if (username == "" || password == "") {
+
+        alert("Please enter username and password");
+        return;
+    }
+
+    // Hide login page
+    document.getElementById("loginPage").style.display = "none";
+
+    // Show attendance page
+    document.getElementById("attendancePage").style.display = "block";
+
+}
+
+
+/* ================= LOGOUT ================= */
+
+function logout() {
+
+    document.getElementById("attendancePage").style.display = "none";
+
+    document.getElementById("loginPage").style.display = "block";
+
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+
+}
+
+
+/* ================= ATTENDANCE ================= */
+
+let students =
+    JSON.parse(localStorage.getItem("students")) || [];
+
+
+/* ADD STUDENT */
+
+function addStudent() {
+
+    let roll =
+        document.getElementById("roll").value;
+
+    let name =
+        document.getElementById("name").value;
+
+    if (roll == "" || name == "") {
+
+        alert("Please enter details");
+        return;
+
+    }
+
+    let student = {
+
+        roll: roll,
+        name: name,
+        present: 0,
+        absent: 0
+
+    };
+
+    students.push(student);
+
+    save();
+
+    display();
+
+    document.getElementById("roll").value = "";
+    document.getElementById("name").value = "";
+
+}
+
+
+/* PRESENT */
+
+function present(index) {
+
+    students[index].present++;
+
+    save();
+
+    display();
+
+}
+
+
+/* ABSENT */
+
+function absent(index) {
+
+    students[index].absent++;
+
+    save();
+
+    display();
+
+}
+
+
+/* DELETE */
+
+function deleteStudent(index) {
+
+    students.splice(index, 1);
+
+    save();
+
+    display();
+
+}
+
+
+/* SAVE */
+
+function save() {
+
+    localStorage.setItem(
+        "students",
+        JSON.stringify(students)
+    );
+
+}
+
+
+/* DISPLAY */
+
+function display() {
+
+    let table =
+        document.getElementById("table");
+
+    table.innerHTML = "";
+
+    for (let i = 0; i < students.length; i++) {
+
+        let total =
+            students[i].present +
+            students[i].absent;
+
+        let percentage = 0;
+
+        if (total > 0) {
+
+            percentage =
+                (students[i].present / total) * 100;
+
+        }
+
+
+        table.innerHTML += `
+
+        <tr>
+
+            <td>${i + 1}</td>
+
+            <td>${students[i].roll}</td>
+
+            <td>${students[i].name}</td>
+
+            <td>
+
+                <button
+                    class="present"
+                    onclick="present(${i})">
+
+                    Present
+
+                </button>
+
+                ${students[i].present}
+
+            </td>
+
+            <td>
+
+                <button
+                    class="absent"
+                    onclick="absent(${i})">
+
+                    Absent
+
+                </button>
+
+                ${students[i].absent}
+
+            </td>
+
+            <td>${total}</td>
+
+            <td>${percentage.toFixed(2)}%</td>
+
+            <td>
+
+                <button
+                    class="delete"
+                    onclick="deleteStudent(${i})">
+
+                    Delete
+
+                </button>
+
+            </td>
+
+        </tr>
+
+        `;
+
+    }
+
+}
+
+display();
+
+</script>
+
+</body>
+</html>
